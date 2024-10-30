@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<!--<body>-->
+
+<style>
+  form{
+  background-color:#ffffff;
+  width:70%;
+  margin:0 auto;
+  padding:15px;
+  }
+</style>
+<form action="/" method="post">
+  <fieldset>
+    <legend>Текстовые поля</legend>
+    <p><label> Ваше имя: <input type="text" placeholder="Имя" required></label></p>
+    <p><label> Ваш email: <input type="email" placeholder="Email" required></label></p>
+    <p><label>Текст сообщения:</label>
+    <label><textarea placeholder="Введите ваше сообщение"></textarea><label></p>
+    <label><button formnovalidate type="submit">Отправить</button> <button type="reset">Очистить</button></label>
+  </fieldset>
+  <fieldset>
+    <legend>Иные элементы управления формой</legend>
+    <label><input type="file" value="Выберите файл"></label>
+    <label>Укажите дату - <input type="date"></label>
+    <label>Кому отправить -
+    <select>
+      <option>Директору</option>
+      <option>В отдел продаж</option>
+    </select></label>
+    <label>Отправить копию письма себе на почту?<input type="radio" name="primer">Да <input type="radio" name="primer">Нет</label>
+    <label>Каким образом направить вам ответ
+    <input type="checkbox" name="a" value="1" checked>>По электронной почте
+    <input type="checkbox" name="a" value="2">По почте на бумажном носителе
+    <input type="checkbox" name="a" value="3">Перезвонить по телефону
+    <label>
+  </fieldset>
+</form>
+
+<!--</body>-->
+</html>

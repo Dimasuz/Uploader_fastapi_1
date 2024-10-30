@@ -1,0 +1,96 @@
+
+version: "3.9"
+
+networks:
+  backend:
+
+volumes:
+  pgdata:
+  static:
+  media:
+
+services:
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6378:6379"
+    networks:
+      backend:
+        aliases:
+          - redis
+
+  db:
+    image: postgres:16.2-alpine3.19
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+#    restart: unless-stopped
+#    container_name: postgres
+#    env_file:
+#      - .env
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 10s
+#    volumes:
+#      - ./logs:/var/log
+#      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+#    networks:
+#      backend:
+#        aliases:
+#          - postgres
+
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+
+  migrate:
+    build: .
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    entrypoint: alembic upgrade head
+    volumes:
+      - ./app:/app
+
+  tests:
+    build:
+        context: .
+        dockerfile: Dockerfile.tests
+    depends_on:
+      - db
+      - app
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      API_HOST: ${API_HOST}
+    entrypoint: pytest tests -v
+    volumes:
+      - ./app:/app
+      - ./tests:/tests
